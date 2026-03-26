@@ -1,47 +1,45 @@
-import { createDecisionGate } from "./decision-gate.service";
 import type { RuleService } from "../rules/rule.service";
+import { evaluateRules } from "./rule-engine";
+import type {
+  DecisionGateInput,
+  DecisionGateOutput,
+} from "./decision-gate.types";
+import {
+  validateDecisionGateInput,
+  buildInvalidInputFallback,
+} from "./decision-gate.validator";
 
-const mockRuleService: RuleService = {
-  async getRules(verticalId: string, env: string) {
-    return [
-      {
-        rule_id: "rule_001",
-        vertical_id: verticalId,
-        priority: 100,
-        condition: {
-          performance_status: "scale",
-          is_fake_winner: false,
-        },
-        output: {
-          decision_status: "pass",
-          decision_action: "scale_up",
-          decision_reason_code: "strong_unit_economics",
-          budget_delta_percent: 15,
-          gate_severity: "low",
-          requires_manual_review: false,
-        },
-      },
-    ];
-  },
-};
+export function createDecisionGate(ruleService: RuleService) {
+  return {
+    async evaluate(input: unknown): Promise<DecisionGateOutput> {
+      if (!validateDecisionGateInput(input)) {
+        return buildInvalidInputFallback();
+      }
 
-async function run() {
-  const decisionGate = createDecisionGate(mockRuleService);
+      const safeInput = input as DecisionGateInput;
 
-  const result = await decisionGate.evaluate({
-    vertical_id: "v01_home_services",
-    environment: "dev",
-    payload: {
-      performance_status: "scale",
-      is_fake_winner: false,
+      const rules = await ruleService.getRules(
+        safeInput.vertical_id,
+        safeInput.environment
+      );
+
+      if (!rules.length) {
+        return {
+          decision_status: "hold",
+          decision_reason_code: "no_rules_found",
+        };
+      }
+
+      const result = evaluateRules(rules, safeInput.payload);
+
+      if (!result) {
+        return {
+          decision_status: "hold",
+          decision_reason_code: "no_matching_rule",
+        };
+      }
+
+      return result;
     },
-  });
-
-  console.log("Decision Gate Result:");
-  console.log(JSON.stringify(result, null, 2));
+  };
 }
-
-run().catch((error) => {
-  console.error("Decision Gate Test Failed:");
-  console.error(error);
-});
