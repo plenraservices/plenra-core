@@ -1,44 +1,131 @@
-# Plenra Infrastructure Blueprint
+Plenra Infrastructure Blueprint
 
-## What this package is
+What Plenra is
 
-This package is a production-oriented blueprint for rebuilding the core Plenra decision infrastructure in your own environment using Python.
+Plenra is a decision intelligence system.
 
-It translates the logic discussed in this chat into:
+Its purpose is to intercept critical business decisions before execution, apply deterministic logic, and prevent financial loss.
 
-- a clear system architecture
-- a phased implementation plan
-- production guardrails
-- agent and engine prompts
-- Python service scaffolds for the core deterministic engines
-- API and orchestration skeletons
-- testing and deployment foundations
+It is NOT:
 
-This package is not a toy demo.
-It is a serious starting point for a controlled, auditable, fail-closed decision system.
+- a generic AI tool
+- a chatbot
+- a dashboard
 
-## Strategic truth
+It is:
 
-The right architecture for Plenra is **not** “LLM everywhere”.
-That would weaken trust, increase variance, and make debugging harder.
+- a decision authority layer
+- fail-closed by design
+- execution-aware
+- auditable and deterministic
 
-The right architecture is:
+---
 
-- deterministic core for rules, scoring, state, safety, and auditability
-- LLM layer only where ambiguity actually exists
-- hard separation between decision authority and language generation
-- strict contracts between engines
-- full observability and replayability
+Core Principles
 
-In practice:
+- Deterministic core controls decisions
+- LLM is never allowed in decision authority
+- Fail-closed on unsafe execution
+- Every decision is logged as an event
+- No learning from untrusted data
+- Strict separation between execution and learning
 
-- **Python** runs services, orchestration, APIs, validation, persistence, and async workers.
-- **LangChain** is optional and should be limited to intake normalization, extraction, summarization, and operator tooling.
-- **Pydantic** defines contracts.
-- **FastAPI** exposes internal and external APIs.
-- **PostgreSQL** stores immutable event streams and learning datasets.
-- **Redis** supports queues, idempotency, locks, and short-lived state.
-- **Celery/RQ/Dramatiq** runs async jobs.
+---
+
+🔴 Current Build Scope (LOCKED)
+
+This repository is currently building a single MVP surface:
+
+Vertical
+
+Ad budget scaling decision
+
+Product Surfaces
+
+- Hosted Plenra Decision Gate (web)
+- External embed widget
+
+Core Flow
+
+User → Input → Validation → Decision → Event Log → Response → Free Limit → Paywall
+
+Monetization
+
+- Free: limited number of decisions
+- Paid: monthly subscription for unlimited decisions
+
+LLM Usage
+
+- Allowed: intake parsing, explanation
+- Forbidden: final decision logic
+
+---
+
+MVP Goal
+
+Deliver a working system where:
+
+- User submits ad budget context
+- System returns PASS / HOLD / STOP
+- Decision is persisted
+- Free usage is enforced
+- Paywall is triggered correctly
+- Embed opens the decision gate
+
+---
+
+Out of Scope (Critical)
+
+Do NOT build:
+
+- multi-vertical system
+- weight update engines
+- decision intelligence engine
+- counterfactual engine
+- autonomous agents
+- dynamic rule generation
+- complex LangChain pipelines
+
+---
+
+Long-Term Direction
+
+Plenra will evolve into:
+
+- multi-vertical decision infrastructure
+- learning-safe system
+- event-driven intelligence layer
+- decision memory engine
+- distribution network via embeds
+
+---
+
+Project Structure
+
+(keep existing structure)
+
+---
+
+Build Order
+
+1. Decision API
+2. Decision Engine
+3. Validation Layer
+4. Event Logging
+5. Free Limit Enforcement
+6. Web UI
+7. Embed Widget
+
+---
+
+Source of Truth
+
+All execution must follow:
+
+- docs/mvp_build_lock.md
+- docs/freelancer_execution_order.md
+
+No deviations allowed.- **Celery/RQ/Dramatiq** runs async jobs.
 - **OpenTelemetry + structured logs** provide auditability.
 
 ## Core design principle
