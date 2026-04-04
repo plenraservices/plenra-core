@@ -1,0 +1,16 @@
+memory-system:
+  connects:
+    - agents
+    - gpts
+    - decisions
+    - systems
+
+decision-intelligence-engine:
+  depends_on:
+    - memory-system
+  connects_to:
+    - freelancer-qa-validator
+
+freelancer-qa-validator:
+  depends_on:
+    - decision-intelligence-engine
