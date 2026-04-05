@@ -1,16 +1,127 @@
-memory-system:
-  connects:
-    - agents
-    - gpts
-    - decisions
-    - systems
-
-decision-intelligence-engine:
-  depends_on:
-    - memory-system
+memory-system-definition:
+  type: system
   connects_to:
-    - freelancer-qa-validator
+    - plenra-core-architecture
+    - plenra-core-principles
+    - chat-extraction-template
+    - decision-outputs
+    - decision-logic
+    - signals-definition
+    - decision-gate-template
+    - campaign-drop-decision-gate
+    - campaign-drop-runtime-input-contract
+    - decision-event-schema
 
-freelancer-qa-validator:
+plenra-core-architecture:
+  type: system
   depends_on:
-    - decision-intelligence-engine
+    - memory-system-definition
+    - plenra-core-principles
+  connects_to:
+    - decision-outputs
+    - decision-logic
+    - signals-definition
+    - decision-gate-template
+    - campaign-drop-decision-gate
+
+plenra-core-principles:
+  type: canon
+  constrains:
+    - plenra-core-architecture
+    - decision-logic
+    - decision-outputs
+    - signals-definition
+    - decision-gate-template
+    - campaign-drop-decision-gate
+    - decision-event-schema
+
+decision-outputs:
+  type: decision_schema
+  depends_on:
+    - plenra-core-architecture
+  connects_to:
+    - decision-logic
+    - decision-gate-template
+    - campaign-drop-decision-gate
+    - decision-event-schema
+
+decision-logic:
+  type: decision_logic
+  depends_on:
+    - decision-outputs
+    - plenra-core-architecture
+    - plenra-core-principles
+  connects_to:
+    - signals-definition
+    - decision-gate-template
+    - campaign-drop-decision-gate
+    - decision-event-schema
+
+signals-definition:
+  type: system
+  depends_on:
+    - decision-logic
+    - plenra-core-architecture
+  connects_to:
+    - campaign-drop-decision-gate
+    - campaign-drop-runtime-input-contract
+
+decision-gate-template:
+  type: decision_gate
+  depends_on:
+    - decision-logic
+    - decision-outputs
+    - signals-definition
+  connects_to:
+    - campaign-drop-decision-gate
+
+campaign-drop-decision-gate:
+  type: decision_gate
+  depends_on:
+    - decision-logic
+    - decision-outputs
+    - signals-definition
+    - campaign-drop-runtime-input-contract
+  emits:
+    - decision-event-schema
+
+campaign-drop-runtime-input-contract:
+  type: schema
+  depends_on:
+    - campaign-drop-decision-gate
+    - signals-definition
+  validates_for:
+    - campaign-drop-decision-gate
+    - decision-event-schema
+
+decision-event-schema:
+  type: schema
+  depends_on:
+    - decision-logic
+    - decision-outputs
+    - campaign-drop-runtime-input-contract
+    - campaign-drop-decision-gate
+
+chat-extraction-template:
+  type: template
+  depends_on:
+    - memory-system-definition
+    - decision-event-schema
+  used_by:
+    - chat-2026-04-05-memory-layer-setup
+
+chat-2026-04-05-memory-layer-setup:
+  type: chat_summary
+  depends_on:
+    - chat-extraction-template
+  documents:
+    - memory-system-definition
+    - plenra-core-architecture
+    - plenra-core-principles
+    - decision-outputs
+    - decision-logic
+    - signals-definition
+    - decision-gate-template
+    - campaign-drop-decision-gate
+    - campaign-drop-runtime-input-contract
+    - decision-event-schema
