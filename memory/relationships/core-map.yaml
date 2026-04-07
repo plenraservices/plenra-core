@@ -185,3 +185,22 @@ meta-controller:
 learning-eligibility-rules:
   constrains:
     - dataset-builder
+
+outcome-window-policy:
+  constrains:
+    - outcome-event
+    - dataset-builder
+
+outcome-attribution-rules:
+  constrains:
+    - outcome-event
+    - execution-event
+
+event-confidence-rules:
+  constrains:
+    - dataset-builder
+
+event-failure-taxonomy:
+  constrains:
+    - dataset-builder
+    - decision-ledger
