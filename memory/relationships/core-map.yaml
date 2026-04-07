@@ -162,3 +162,26 @@ decision-ledger:
     - decision-event
     - execution-event
     - outcome-event
+
+decision-intelligence-engine:
+  depends_on:
+    - dataset-builder
+    - decision-event
+    - outcome-event
+  feeds:
+    - weight-update-engine
+
+weight-update-engine:
+  depends_on:
+    - decision-intelligence-engine
+  feeds:
+    - decision-logic
+
+meta-controller:
+  constrains:
+    - weight-update-engine
+    - decision-intelligence-engine
+
+learning-eligibility-rules:
+  constrains:
+    - dataset-builder
