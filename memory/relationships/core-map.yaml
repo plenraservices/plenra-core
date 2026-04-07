@@ -125,3 +125,40 @@ chat-2026-04-05-memory-layer-setup:
     - campaign-drop-decision-gate
     - campaign-drop-runtime-input-contract
     - decision-event-schema
+
+decision-event:
+  type: schema
+  emits:
+    - execution-event
+  feeds:
+    - decision-ledger
+
+execution-event:
+  type: schema
+  depends_on:
+    - decision-event
+  feeds:
+    - outcome-event
+
+outcome-event:
+  type: schema
+  depends_on:
+    - execution-event
+  feeds:
+    - dataset-builder
+
+dataset-builder:
+  type: system
+  depends_on:
+    - decision-event
+    - execution-event
+    - outcome-event
+  feeds:
+    - decision-intelligence-engine
+
+decision-ledger:
+  type: system
+  documents:
+    - decision-event
+    - execution-event
+    - outcome-event
