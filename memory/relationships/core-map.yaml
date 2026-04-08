@@ -204,3 +204,27 @@ event-failure-taxonomy:
   constrains:
     - dataset-builder
     - decision-ledger
+
+system-not-to-do-rules:
+  type: policy
+  constrains:
+    - decision-gate-template
+    - route-policy
+    - execution-gateway
+
+user-not-to-do-guidance:
+  type: tactic
+  depends_on:
+    - campaign-drop-decision-gate
+    - decision-outputs
+  connects_to:
+    - not-to-do-generation-pattern
+
+not-to-do-generation-pattern:
+  type: strategy
+  depends_on:
+    - decision-logic
+    - decision-outputs
+    - system-not-to-do-rules
+  feeds:
+    - user-not-to-do-guidance
